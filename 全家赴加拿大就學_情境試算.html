@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全家赴加拿大就學：情境試算</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f6f5f2;--surface:#fcfcfb;--line:#e2e0da;--text:#0b0b0b;--sub:#52514e;--muted:#7b7a75;
+  --s1:#2a78d6;--s2:#eb6834;--accent:#1f4e79;
+  --good:#1a7f4b;--warn:#a86400;--bad:#c0392b;
+  --good-bg:#e7f4ec;--warn-bg:#fbf0d9;--bad-bg:#fbe9e6;
+}
+@media (prefers-color-scheme:dark){
+  :root{color-scheme:dark;--bg:#121211;--surface:#1a1a19;--line:#34332f;--text:#f0efec;--sub:#c3c2b7;--muted:#97968d;
+    --s1:#3987e5;--s2:#d95926;--accent:#8fbbe6;
+    --good:#55c58a;--warn:#e0a53a;--bad:#f08576;--good-bg:#17301f;--warn-bg:#33280f;--bad-bg:#3a1b17;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Microsoft JhengHei","Noto Sans TC","PingFang TC",sans-serif;line-height:1.65;font-size:15px}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:26px;margin:0 0 6px;line-height:1.3}
+h2{font-size:19px;margin:44px 0 6px;padding-top:6px}
+h2 small{font-weight:400;color:var(--muted);font-size:13px;margin-left:8px}
+p.lead{color:var(--sub);margin:0 0 14px;max-width:70ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.bottom{border-left:4px solid var(--accent)}
+.bottom b{color:var(--accent)}
+.grid5{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.grid5 .card h3{margin:0 0 6px;font-size:16px}
+.grid5 .card ul{margin:0;padding-left:18px;color:var(--sub);font-size:14px}
+.grid5 .card .ref{display:block;margin-top:8px;font-size:12px;color:var(--muted)}
+/* timeline */
+.tl-scroll{overflow-x:auto}
+.tl{display:grid;grid-template-columns:92px repeat(11,minmax(68px,1fr));gap:3px;min-width:860px;font-size:12.5px}
+.tl .yr{text-align:center;color:var(--muted);font-variant-numeric:tabular-nums;padding-bottom:2px}
+.tl .who{font-weight:700;display:flex;align-items:center}
+.tl .bar{border-radius:6px;padding:5px 8px;line-height:1.35;border:1px solid var(--line);background:var(--bg)}
+.tl .bar.tw{color:var(--sub)}
+.tl .bar.hs{background:color-mix(in srgb,var(--s1) 16%,var(--surface));border-color:color-mix(in srgb,var(--s1) 40%,var(--surface))}
+.tl .bar.un{background:color-mix(in srgb,var(--s2) 16%,var(--surface));border-color:color-mix(in srgb,var(--s2) 40%,var(--surface))}
+.tl .bar.wk{background:color-mix(in srgb,var(--good) 14%,var(--surface));border-color:color-mix(in srgb,var(--good) 36%,var(--surface))}
+.tl .mark{font-size:12px;color:var(--sub);border-top:2px solid var(--accent);padding-top:3px;line-height:1.35}
+.note{font-size:13px;color:var(--muted);margin:8px 0 0}
+/* calculator */
+.calc{display:grid;grid-template-columns:330px 1fr;gap:16px;align-items:start}
+@media (max-width:860px){.calc{grid-template-columns:1fr}}
+.calc>*,.calc>*>*,.grid5>*{min-width:0}
+.seg button{min-width:0}
+.ctl{margin-bottom:14px}
+.ctl label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;margin-bottom:3px}
+.ctl label output{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.ctl input[type=range]{width:100%;accent-color:var(--s1)}
+.ctl .hint{font-size:12px;color:var(--muted);line-height:1.4}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{flex:1 1 auto;font:inherit;font-size:13px;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--text);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.presets button{font:inherit;font-size:13px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer}
+.presets button:hover,.seg button:hover:not(:disabled){border-color:var(--accent)}
+.verdict{border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:15px}
+.verdict b{font-size:17px}
+.verdict.good{background:var(--good-bg);border:1px solid var(--good)}
+.verdict.warn{background:var(--warn-bg);border:1px solid var(--warn)}
+.verdict.bad{background:var(--bad-bg);border:1px solid var(--bad)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile .k{font-size:12.5px;color:var(--sub)}
+.tile .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.3}
+.tile .v small{font-size:13px;font-weight:400;color:var(--muted);margin-left:3px}
+.tile .d{font-size:12px;color:var(--muted)}
+.chartbox{position:relative;overflow-x:auto}
+.chartbox svg{min-width:560px}
+.chartbox h3{margin:0 0 2px;font-size:15px}
+.legend{display:flex;gap:16px;font-size:12.5px;color:var(--sub);margin-bottom:4px}
+.legend i{display:inline-block;width:18px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
+.legend i.dash{border-top-style:dashed}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:inherit;fill:var(--sub);font-size:12px}
+#tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12.5px;box-shadow:0 4px 14px #0002;display:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+#tip b{display:block;margin-bottom:2px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--sub);font-weight:700;font-size:12.5px}
+td.neg{color:var(--bad);font-weight:700}
+.tblwrap{overflow-x:auto;margin-top:12px}
+.assump{font-size:13px;color:var(--sub);columns:2;column-gap:28px;margin:0;padding-left:18px}
+@media (max-width:700px){.assump{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>全家赴加拿大就學：情境試算</h1>
+<p class="lead">這一頁是《全家赴加拿大就學決策報告》的互動導覽。完整論證、資料來源與待確認事項都在 PDF，這裡只回答一個問題：假設變了，2,000 萬夠不夠。</p>
+
+<div class="card bottom">
+  <b>結論：</b>建議方案是一位家長就讀公立大學教育碩士、全家同行。依基準假設，2,000 萬差一點才夠：父母在 2034 年畢業後工作簽證到期後若仍有合法工作許可，妹妹 2037 年畢業時短少約 13 萬；接不上工作許可而在 2034 年返台，短少約 84 萬；2034 年前取得永久居民，孩子改繳本地生學費，則約剩 575 萬。安全的準備金額是 3,000 萬，最低 2,600 萬。
+</div>
+
+<h2>一、五個面向<small>各面向的重點與 PDF 對應章節</small></h2>
+<div class="grid5">
+  <div class="card"><h3>教育</h3><ul><li>2029 年 9 月出發，姊姊申請讀 10 年級，妹妹讀 9 年級</li><li>家長就讀 16 個月以上的公立大學碩士，孩子公立高中免學費</li><li>優先卑詩省；安大略省免學費多半只到 18 歲</li></ul><span class="ref">PDF 第二、三章</span></div>
+  <div class="card"><h3>財務</h3><ul><li>一半美國公債、一半加拿大公債，依付款年度分批到期</li><li>150 萬台幣定存作緊急預備金</li><li>第一批債券須在 2028 年底前到期，供學簽財力證明</li></ul><span class="ref">PDF 第四章</span></div>
+  <div class="card"><h3>生活</h3><ul><li>全家四人每年生活費約 10 萬加幣（2026 年價格）</li><li>配偶持開放式工作許可工作，就學家長畢業後工作</li><li>父母成為加拿大稅務居民，須申報全球所得</li></ul><span class="ref">PDF 第五章、4.7 節</span></div>
+  <div class="card"><h3>移民身分</h3><ul><li>碩士畢業後的工作簽證不限科系</li><li>法語達標可走快速移民的法語類別</li><li>取得永久居民是財務上影響最大的單一變數</li></ul><span class="ref">PDF 第六章</span></div>
+  <div class="card"><h3>行前準備</h3><ul><li>2026 至 2029 年：英文、法文、選校、開戶、建立債券部位</li><li>出發前準備費用約 75 至 80 萬台幣</li><li>透過官方名冊查核移民顧問執照</li></ul><span class="ref">PDF 第七章、附錄</span></div>
+</div>
+
+<h2>二、時間軸<small>欄位是學年，例如 2029 代表 2029 年 9 月到 2030 年 6 月</small></h2>
+<div class="card tl-scroll"><div class="tl" id="tl"></div>
+<p class="note">藍色是高中，橘色是大學，綠色是工作。最下面一列是資金的檢核時點。</p></div>
+
+<h2>三、情境試算<small>拖動左側條件，右側即時重算</small></h2>
+<div class="presets" id="presets"></div>
+<div class="calc">
+  <div class="card" id="controls"></div>
+  <div>
+    <div id="verdict" class="verdict"></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="card chartbox">
+      <h3>每年 9 月付款後的資金餘額（萬台幣）</h3>
+      <div class="legend"><span><i style="border-color:var(--s1)"></i>目前設定</span><span><i class="dash" style="border-color:var(--s2)"></i>基準（教育碩士、全程國際生學費、前期費用 80 萬、父母有工作許可留到 2037 年）</span></div>
+      <svg id="chart" viewBox="0 0 720 320" role="img" aria-label="每年資金餘額折線圖，數值見下方表格"></svg>
+      <div id="tip"></div>
+    </div>
+    <div class="card tblwrap">
+      <table id="tbl"></table>
+      <p class="note">單位：萬台幣。餘額為負代表資金已用完，不足的部分須另外補足。</p>
+    </div>
+  </div>
+</div>
+
+<h2>四、試算的固定假設</h2>
+<div class="card">
+<ul class="assump">
+  <li>物價與學費每年上漲 3%，金額以 2026 年價格為基準</li>
+  <li>2026 年 11 月投入資金，2029 年 9 月出發。前期費用依左側設定，預設 80 萬，假設在出發前 0.8 年（約 2028 年 11 月）支出</li>
+  <li>全家生活費每年 10.02 萬加幣，抵達當年另加安頓費 4 萬加幣</li>
+  <li>家長學費：碩士每年 3 萬加幣、學院每年 1.8 萬加幣，各兩年</li>
+  <li>大學：國際生學費依左側設定，本地生 8,000 加幣，另加書籍雜費 3,000 加幣</li>
+  <li>收入（稅後）：配偶每年 3 萬加幣，第一年減半；就學家長 2031 年起每年 3.6 萬加幣。學院方案只計後者</li>
+  <li>寄宿方案：每個孩子每年 4.3 萬加幣；大學期間在外生活費每人每年 2.2 萬加幣</li>
+  <li>父母返台後：加拿大收入與家庭開支停止，孩子在外生活費每人每年 2.4 萬加幣，搬遷費 5,000 加幣；父母在台灣的收支不計入這筆資金</li>
+  <li>姊姊 2032 至 2036 年、妹妹 2033 至 2037 年就讀大學</li>
+  <li>餘額為正時，全部資金依左側報酬率計息</li>
+  <li>每學年的收支集中在 9 月一次結算，是年度近似；「畢業時餘額」指 2036 年 9 月付款後的餘額</li>
+  <li>家長收入與費用一樣每年調升 3%</li>
+  <li>PDF 報告各表以前期費用 60 萬計算；把左側「前期費用」調到 60 萬即可重現 PDF 的數字</li>
+  <li>父母在取得永久居民之前返台時，視為未取得，孩子全程繳國際生學費。這是模型的簡化，個案可能不同</li>
+  <li>餘額為負時不計借款利息，負數代表累計的資金缺口；若以借款補足，須另加利息</li>
+  <li>「所需起始資金」以期末餘額反推。現有設定下餘額逐年遞減，期末不為負即全程不為負</li>
+  <li>金額四捨五入到萬</li>
+  <li>父母留到 2037 年的前提是有永久居民或其他合法工作許可；未取得永久居民時請把「父母返回台灣」設為 2034 年</li>
+</ul>
+<p class="note">以上金額多數是估計值，用途是比較情境，不是預測。匯率、學費與移民規定請以出發前的最新資料為準。</p>
+</div>
+
+</div>
+
+<script id="model">
+const YEARS=[2029,2030,2031,2032,2033,2034,2035,2036];
+function run(p){
+  const r=p.r, INF=0.03, cd=(p.scn==='C'||p.scn==='D');
+  const pr=cd?p.pr:null, ret=cd?p.ret:null;
+  const prOk=pr&&(!ret||pr<=ret)?pr:null;
+  let bal=p.init*10*Math.pow(1+r,34/12);
+  bal-=p.prep*10*Math.pow(1+r,0.8);
+  const rows=[];let dep=null;
+  for(const y of YEARS){
+    const f=Math.pow(1+INF,y-2026), i=y-2029;
+    let home=0,uni=0,inc=0;
+    const away=ret&&y>=ret;
+    if(cd){
+      if(!away){
+        home=100.2*f+(i<2?(p.scn==='D'?30:18)*f:0)+(i===0?40*f:0);
+        const fi=p.wage==='grow'?f:(p.wage==='f2029'?Math.pow(1+INF,3):1);
+        let b=p.scn==='D'?30*fi*(i===0?0.5:1):0;
+        if(p.bStop&&y>=p.bStop) b=0;
+        const a=y>=p.aStart?36*fi:0;
+        if(p.hsFee&&y===2031) home+=2*18.9*f;
+        inc=(a+b)*p.incmul;
+      }else if(y===ret){home=5*f;}
+    }else{
+      const n=(y<=2031?1:0)+(y<=2032?1:0);
+      if(p.scn==='A') home=n*43*f+(i===0?10*f:0);
+      else if(y<=2032) home=n*18.9*f+87.7*f+(i===0?35*f:0);
+    }
+    const nu=((y>=2032&&y<=2035)?1:0)+((y>=2033&&y<=2036)?1:0);
+    if(nu){
+      const dom=prOk&&y>=prOk;
+      let t=(dom?8:p.uniT)+3;
+      if(!cd&&!(p.scn==='B'&&y<=2032)) t+=22;
+      if(away) t+=24;
+      uni=nu*t*f;
+    }
+    home*=p.costmul;uni*=p.costmul;
+    const cost=home+uni, net=(cost-inc)*p.fx;
+    bal-=net;
+    if(bal<0&&dep===null) dep=y;
+    rows.push({y,home:home*p.fx,uni:uni*p.fx,cost:cost*p.fx,inc:inc*p.fx,net,bal});
+    if(bal>0) bal*=1+r;
+  }
+  return {rows,dep,end:rows[rows.length-1].bal,prOk};
+}
+function needInit(p,target){
+  let lo=0,hi=10000;
+  for(let k=0;k<40;k++){const m=(lo+hi)/2; if(run({...p,init:m}).end>=target*10) hi=m; else lo=m;}
+  return hi;
+}
+const BASE={scn:'D',init:2000,prep:80,r:0.035,fx:23.5,costmul:1,incmul:1,uniT:45,pr:null,ret:null,bStop:null,aStart:2031,wage:'grow',hsFee:false};
+</script>
+<script>
+// ---------- timeline ----------
+(function(){
+  const tl=document.getElementById('tl');let h='<div></div>';
+  for(let y=2026;y<=2036;y++)h+=`<div class="yr">${y}</div>`;
+  const row=(who,segs)=>{h+=`<div class="who">${who}</div>`;for(const[s,c,t]of segs)h+=`<div class="bar ${c}" style="grid-column:span ${s}">${t}</div>`;};
+  row('姊姊',[[3,'tw','台灣 7 至 9 年級'],[3,'hs','加拿大高中 10 至 12 年級'],[4,'un','大學四年，2036 年 6 月畢業'],[1,'tw','已畢業']]);
+  row('妹妹',[[3,'tw','台灣 6 至 8 年級'],[4,'hs','加拿大高中 9 至 12 年級'],[4,'un','大學四年，2037 年 6 月畢業']]);
+  row('就學家長',[[3,'tw','考雅思、學法文、申請碩士'],[2,'hs','教育碩士'],[6,'wk','畢業後工作簽證，工作並申請永久居民']]);
+  row('配偶',[[3,'tw','台灣工作，準備英文'],[8,'wk','開放式工作許可，在加拿大工作']]);
+  h+='<div class="who">資金</div>';
+  const marks=[[2,'2026 起建立債券與定存部位'],[1,'2028 年 11 月第一批債券到期，供財力證明'],[1,'2029 年 9 月出發，餘額應有 2,140 萬以上'],[3,'2030 至 2032 年其餘債券分批到期'],[1,'2033 年 6 月決定父母是否返台；9 月餘額應有 990 萬以上'],[1,'2034 年前取得永久居民則學費大降'],[2,'2037 年 6 月妹妹畢業']];
+  for(const[s,t]of marks)h+=`<div class="mark" style="grid-column:span ${s}">${t}</div>`;
+  tl.innerHTML=h;
+})();
+
+// ---------- state & controls ----------
+let S={...BASE};
+const fmt=v=>{const n=Math.round(v/10);return (n<0?'−':'')+Math.abs(n).toLocaleString('en-US');};
+const sfmt=v=>{const n=Math.round(v/10);return (n<0?'−':'+')+Math.abs(n).toLocaleString('en-US');};
+const SEGS={
+  scn:{label:'方案',opts:[['A','孩子寄宿'],['B','家長陪讀'],['C','學院文憑'],['D','教育碩士']],hint:'A：孩子獨自寄宿，父母留台。B：一位家長以訪客身分陪讀，高中須繳國際生學費。C、D：全家同行，一位家長就學。'},
+  pr:{label:'取得永久居民',opts:[[null,'未取得'],[2033,'2033 年'],[2034,'2034 年'],[2035,'2035 年']],hint:'取得當年 9 月起，孩子改繳本地生學費。'},
+  ret:{label:'父母返回台灣',opts:[[null,'留到畢業'],[2033,'2033 年'],[2034,'2034 年'],[2035,'2035 年'],[2036,'2036 年']],hint:'該年 9 月開學前返台。最早是 2033 年，因為妹妹那年 6 月才高中畢業。未取得永久居民時，工作簽證在 2034 年到期，應選 2034 年。'}
+};
+Object.assign(SEGS,{
+  bStop:{label:'家長乙（配偶）停止工作',opts:[[null,'不中斷'],[2031,'2031 年起'],[2034,'2034 年起']],hint:'家長甲畢業後，配偶的工作簽證須重新申請，可能接不上。'},
+  aStart:{label:'家長甲（就學家長）開始工作',opts:[[2031,'2031 年'],[2032,'2032 年'],[2033,'2033 年']],hint:'預設畢業當年就業。'},
+  wage:{label:'薪資調升',opts:[['grow','每年 +3%'],['f2029','停在 2029 年水準'],['f2026','停在 2026 年水準']],hint:'費用一律每年漲 3%。'},
+  hsFee:{label:'2031–32 學年高中學費',opts:[[false,'免學費'],[true,'須繳國際生學費']],hint:'家長甲畢業後若未及時符合免學費條件，兩人當年約 103 萬台幣。'}
+});
+const RANGES={
+  prep:{label:'出發前的前期費用',min:60,max:100,step:5,show:v=>v+' 萬台幣',hint:'語言課程、檢定、顧問、申請與實地探訪。報告改估為 75 至 80 萬；PDF 各表用 60 萬。'},
+  init:{label:'起始資金',min:1500,max:4000,step:50,show:v=>v.toLocaleString('en-US')+' 萬台幣'},
+  r:{label:'年報酬率',min:0.01,max:0.05,step:0.0025,show:v=>(v*100).toFixed(2).replace(/0$/,'')+'%',hint:'債券與定存的綜合報酬率，基準是 3.5%。'},
+  fx:{label:'加幣匯率',min:21,max:29,step:0.05,show:v=>'1 加幣 = '+v.toFixed(2)+' 台幣',hint:'基準 23.5；28.2 相當於加幣升值 20%。'},
+  incmul:{label:'家長在加拿大的收入',min:0,max:1.5,step:0.1,show:v=>'預期的 '+Math.round(v*100)+'%',hint:'預期值是兩人稅後合計每年約 6.6 萬加幣（2026 年價格）。'},
+  costmul:{label:'整體開支',min:0.9,max:1.3,step:0.05,show:v=>(v>=1?'+':'−')+Math.abs(Math.round((v-1)*100))+'%',hint:'生活費與學費一起加減。'},
+  uniT:{label:'大學國際生學費',min:35,max:65,step:1,show:v=>'每人每年 '+(v/10).toFixed(1)+' 萬加幣',hint:'基準 4.5 萬；熱門科系可達 6 萬以上。'}
+};
+const PRESETS=[
+  ['基準',{}],
+  ['PDF 表列口徑（前期費用 60 萬）',{prep:60}],
+  ['家長乙 2031 年起無法工作',{bStop:2031}],
+  ['2034 年取得永久居民',{pr:2034}],
+  ['收入只有一半',{incmul:0.5}],
+  ['組合壓力：匯率 +10%、開支 +10%、報酬 3%',{fx:25.85,costmul:1.1,r:0.03}],
+  ['2034 年工作簽證到期，父母返台',{ret:2034}],
+  ['2033 年父母返台',{ret:2033}],
+  ['準備 3,000 萬',{init:3000}]
+];
+function build(){
+  const c=document.getElementById('controls');let h='';
+  const seg=k=>{const s=SEGS[k];h+=`<div class="ctl"><label>${s.label}</label><div class="seg" data-k="${k}">`+s.opts.map(([v,t])=>`<button type="button" data-v="${v}">${t}</button>`).join('')+`</div><div class="hint">${s.hint}</div></div>`;};
+  const rng=k=>{const s=RANGES[k];h+=`<div class="ctl"><label for="r_${k}">${s.label}<output id="o_${k}"></output></label><input type="range" id="r_${k}" data-k="${k}" min="${s.min}" max="${s.max}" step="${s.step}">${s.hint?`<div class="hint">${s.hint}</div>`:''}</div>`;};
+  seg('scn');rng('init');rng('prep');seg('pr');seg('ret');rng('incmul');seg('bStop');seg('aStart');seg('wage');seg('hsFee');rng('r');rng('fx');rng('costmul');rng('uniT');
+  c.innerHTML=h;
+  c.addEventListener('click',e=>{const b=e.target.closest('.seg button');if(!b||b.disabled)return;const k=b.parentNode.dataset.k,v=b.dataset.v;S[k]=SEGS[k].opts.find(o=>String(o[0])===v)[0];render();});
+  c.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;S[k]=+e.target.value;render();});
+  document.getElementById('presets').innerHTML=PRESETS.map((p,i)=>`<button type="button" data-i="${i}">${p[0]}</button>`).join('');
+  document.getElementById('presets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S={...BASE,...PRESETS[b.dataset.i][1]};render();});
+}
+const baseRes=run(BASE);
+let cur=null;
+function render(){
+  const cd=S.scn==='C'||S.scn==='D';
+  if(!cd){for(const k in SEGS)if(k!=='scn')S[k]=BASE[k];}
+  for(const k in SEGS)document.querySelectorAll(`.seg[data-k=${k}] button`).forEach(b=>{
+    b.setAttribute('aria-pressed',String(S[k])===b.dataset.v);
+    b.disabled=(k!=='scn'&&!cd&&b.dataset.v!==String(BASE[k]));
+  });
+  for(const k in RANGES){document.getElementById('r_'+k).value=S[k];document.getElementById('o_'+k).textContent=RANGES[k].show(S[k]);}
+  document.getElementById('r_incmul').disabled=!cd;
+  const res=cur=run(S),rows=res.rows,end=res.end;
+  const minRow=rows.reduce((a,b)=>b.bal<a.bal?b:a);
+  const tc=rows.reduce((a,b)=>a+b.cost,0),ti=rows.reduce((a,b)=>a+b.inc,0);
+  const need0=Math.round(needInit(S,0)/10)*10,need300=Math.round(needInit(S,300)/10)*10;
+  // verdict
+  const v=document.getElementById('verdict');let cls,txt;
+  if(end>=3000){cls='good';txt=`<b>✓ 夠用，且有緩衝</b><br>妹妹 2037 年畢業時約剩 ${fmt(end)} 萬台幣。`;}
+  else if(end>=0){cls='warn';txt=`<b>！勉強夠用，緩衝不足</b><br>畢業時約剩 ${fmt(end)} 萬台幣，低於 300 萬的安全緩衝。任何一項假設變差就會不足。`;}
+  else{cls='bad';txt=`<b>✕ 資金不足</b><br>到畢業時短少約 ${fmt(-end)} 萬台幣，資金在 ${res.dep} 學年用完。`;}
+  if(cd&&!res.prOk&&!S.ret)txt+=`<br>這個結果假設父母在 2034 年畢業後工作簽證到期後仍有合法工作許可。接不上時，請把「父母返回台灣」設為 2034 年。`;
+  if(S.pr&&S.ret&&S.pr>S.ret)txt+=`<br>父母在取得永久居民之前返台，這裡視為未取得，孩子全程繳國際生學費。`;
+  if(!cd)txt+=`<br>這個方案沒有家長在加拿大工作，永久居民、返台、收入與高中學費的設定不適用。`;
+  v.className='verdict '+cls;v.innerHTML=txt;
+  // tiles
+  const d=end-baseRes.end;
+  document.getElementById('tiles').innerHTML=[
+    ['2037 年畢業時餘額',fmt(end),'萬',Math.abs(d)<5?'與基準相同':'比基準 '+sfmt(d)+' 萬'],
+    ['期末不為負所需的起始資金',need0.toLocaleString('en-US'),'萬','保留 300 萬緩衝需 '+need300.toLocaleString('en-US')+' 萬'],
+    ['八年總支出',fmt(tc),'萬','2029 至 2037 年，含學費與生活費'],
+    ['加拿大工作收入',fmt(ti),'萬','由資金負擔的淨額 '+fmt(tc-ti)+' 萬']
+  ].map(t=>`<div class="tile"><div class="k">${t[0]}</div><div class="v">${t[1]}<small>${t[2]}</small></div><div class="d">${t[3]}</div></div>`).join('');
+  // table
+  let h='<tr><th>學年</th><th>家庭或高中開支</th><th>大學費用</th><th>總支出</th><th>加拿大收入</th><th>資金淨支出</th><th>9 月付款後餘額</th></tr>';
+  for(const r of rows)h+=`<tr><td>${r.y}–${String(r.y+1).slice(2)}</td><td>${fmt(r.home)}</td><td>${fmt(r.uni)}</td><td>${fmt(r.cost)}</td><td>${fmt(r.inc)}</td><td>${fmt(r.net)}</td><td class="${r.bal<0?'neg':''}">${fmt(r.bal)}</td></tr>`;
+  h+=`<tr><th>合計</th><th></th><th></th><th>${fmt(tc)}</th><th>${fmt(ti)}</th><th>${fmt(tc-ti)}</th><th></th></tr>`;
+  document.getElementById('tbl').innerHTML=h;
+  draw(rows);
+}
+// ---------- chart ----------
+const W=720,H=320,M={l:54,r:86,t:14,b:30};
+let SC=null;
+function draw(rows){
+  const svg=document.getElementById('chart');
+  const all=rows.map(r=>r.bal/10).concat(baseRes.rows.map(r=>r.bal/10),[0]);
+  const step=500;let lo=Math.floor(Math.min(...all)/step)*step,hi=Math.ceil(Math.max(...all)/step)*step;
+  if(hi-lo>4000){/* keep ticks readable */}
+  const tstep=(hi-lo)>4000?1000:500;
+  const x=i=>M.l+i*(W-M.l-M.r)/7,y=v=>M.t+(hi-v)*(H-M.t-M.b)/(hi-lo);
+  SC={x,y};
+  let s='';
+  for(let t=lo;t<=hi;t+=tstep)s+=`<line x1="${M.l}" x2="${W-M.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" stroke-width="${t===0?0:1}"/><text x="${M.l-8}" y="${y(t)+4}" text-anchor="end">${t<0?'−':''}${Math.abs(t).toLocaleString('en-US')}</text>`;
+  s+=`<line x1="${M.l}" x2="${W-M.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--muted)" stroke-width="1.5"/>`;
+  rows.forEach((r,i)=>s+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle">${r.y}</text>`);
+  const path=rs=>rs.map((r,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(r.bal/10).toFixed(1)).join('');
+  s+=`<path d="${path(baseRes.rows)}" fill="none" stroke="var(--s2)" stroke-width="2" stroke-dasharray="6 5"/>`;
+  s+=`<path d="${path(rows)}" fill="none" stroke="var(--s1)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  rows.forEach((r,i)=>s+=`<circle cx="${x(i)}" cy="${y(r.bal/10)}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>`);
+  const e1=rows[7].bal/10,e2=baseRes.rows[7].bal/10;
+  let y1=y(e1)+4,y2=y(e2)+4;
+  if(Math.abs(y1-y2)<15){if(e1>=e2){y1=Math.min(y1,y2)-4;y2=y1+16;}else{y2=Math.min(y1,y2)-4;y1=y2+16;}}
+  s+=`<text x="${x(7)+10}" y="${y1}" style="fill:var(--text);font-weight:700">${fmt(rows[7].bal)} 萬</text>`;
+  if(Math.abs(e1-e2)>=1)s+=`<text x="${x(7)+10}" y="${y2}">基準 ${fmt(baseRes.rows[7].bal)}</text>`;
+  s+=`<line id="xh" y1="${M.t}" y2="${H-M.b}" stroke="var(--muted)" stroke-width="1" visibility="hidden"/>`;
+  s+=`<rect x="${M.l-10}" y="${M.t}" width="${W-M.l-M.r+20}" height="${H-M.t-M.b}" fill="transparent" id="hit"/>`;
+  svg.innerHTML=s;
+}
+(function(){
+  const svg=document.getElementById('chart'),tip=document.getElementById('tip');
+  svg.addEventListener('mousemove',e=>{
+    if(!cur)return;const b=svg.getBoundingClientRect(),px=(e.clientX-b.left)*W/b.width;
+    const i=Math.max(0,Math.min(7,Math.round((px-M.l)/((W-M.l-M.r)/7))));
+    const r=cur.rows[i],xh=document.getElementById('xh');
+    xh.setAttribute('x1',SC.x(i));xh.setAttribute('x2',SC.x(i));xh.setAttribute('visibility','visible');
+    tip.innerHTML=`<b>${r.y} 年 9 月付款後</b>目前設定：${fmt(r.bal)} 萬<br>基準：${fmt(baseRes.rows[i].bal)} 萬<br>當年支出 ${fmt(r.cost)} 萬，收入 ${fmt(r.inc)} 萬`;
+    tip.style.display='block';
+    const left=SC.x(i)*b.width/W;
+    tip.style.left=(left>b.width*0.6?left-tip.offsetWidth-12:left+14)+svg.offsetLeft+'px';
+    tip.style.top=svg.offsetTop+20+'px';
+  });
+  svg.addEventListener('mouseleave',()=>{tip.style.display='none';const xh=document.getElementById('xh');if(xh)xh.setAttribute('visibility','hidden');});
+})();
+build();render();
+</script>
+</body>
+</html>
